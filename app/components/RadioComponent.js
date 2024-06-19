@@ -25,23 +25,27 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (audioRef.current) {
-      const handleEnded = () => {
-        fetchRadioData();
-      };
+    const audioElement = audioRef.current;
 
-      audioRef.current.addEventListener("ended", handleEnded);
+    const handleEndedOrError = () => {
+      fetchRadioData();
+    };
+
+    if (audioElement) {
+      audioElement.addEventListener("ended", handleEndedOrError);
+      audioElement.addEventListener("error", handleEndedOrError);
 
       return () => {
-        audioRef.current.removeEventListener("ended", handleEnded);
+        audioElement.removeEventListener("ended", handleEndedOrError);
+        audioElement.removeEventListener("error", handleEndedOrError);
       };
     }
-  }, [audioRef.current]);
+  }, [audioRef]);
 
   useEffect(() => {
     const interval = setInterval(() => {
       fetchRadioData();
-    }, 1000); 
+    }, 1000);
 
     return () => clearInterval(interval);
   }, []);
